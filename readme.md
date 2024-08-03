@@ -7,7 +7,7 @@
 2. [ ] Flexible yet Simple Producer
     - [ ] Producer must implement all the needs of the consumer such as batch
     - [ ] An interface to control state of produced message(s)
-3. [ ] Unbound internal and external Interface definitions such as ConsumerInstance
+3. [x] Unbound internal and external Interface definitions such as ConsumerInstance
 4. [ ] Integration Test
 
 # How to run locally to test package behaviour ?

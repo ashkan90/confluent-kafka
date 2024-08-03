@@ -3,11 +3,12 @@ package confluent_kafka
 import (
 	"context"
 	"errors"
+	"sync"
+	"time"
+
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/sirupsen/logrus"
 	"k8s.io/utils/strings/slices"
-	"sync"
-	"time"
 )
 
 // ErrClosedConsumerGroup is the error returned when a method is called on a consumer group that has been closed.
@@ -46,6 +47,20 @@ type ConsumerGroup interface {
 	// Close stops the ConsumerGroup and detaches any running sessions. It is required to call
 	// this function before the object passes out of scope, as it will otherwise leak memory.
 	Close() error
+}
+
+type ConsumerGroupHandler interface {
+	// Setup is run at the beginning of a new session, before ConsumeClaim.
+	Setup(ConsumerGroup) error
+
+	// Cleanup is run at the end of a session, once all ConsumeClaim goroutines have exited
+	// but before the offsets are committed for the very last time.
+	Cleanup(ConsumerGroup) error
+
+	// ConsumeClaim must start a consumer loop of ConsumerGroupClaim's Messages().
+	// Once the Messages() channel is closed, the Handler must finish its processing
+	// loop and exit.
+	ConsumeClaim(ConsumerGroup, ConsumerGroupClaim) error
 }
 
 type consumerGroup struct {

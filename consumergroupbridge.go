@@ -3,9 +3,10 @@ package confluent_kafka
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
 type ConsumerGroupBridge interface {

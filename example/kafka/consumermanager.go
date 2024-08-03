@@ -1,7 +1,9 @@
-package confluent_kafka
+package kafka
 
 import (
+	"confluent_kafka"
 	"context"
+
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/sirupsen/logrus"
 
@@ -9,17 +11,18 @@ import (
 )
 
 type ConsumerGroupHandler interface {
-	ConsumeClaim(sess ConsumerGroup, claim ConsumerGroupClaim) error
+	confluent_kafka.ConsumerGroupHandler
+
 	Ready()
 	Status() chan bool
 }
 
 type CustomHandler interface {
-	Do(ctx context.Context, msg *ConsumerMessage) error
+	Do(ctx context.Context, msg *confluent_kafka.ConsumerMessage) error
 }
 
 type IConsumerManager interface {
-	Process(ctx context.Context, msg *ConsumerMessage) error
+	Process(ctx context.Context, msg *confluent_kafka.ConsumerMessage) error
 }
 
 type consumerManager struct {
@@ -36,7 +39,7 @@ func NewConsumerManager(l *logrus.Logger, ch CustomHandler, ni nrclient.INewReli
 	}
 }
 
-func (cm *consumerManager) Process(ctx context.Context, msg *ConsumerMessage) error {
+func (cm *consumerManager) Process(ctx context.Context, msg *confluent_kafka.ConsumerMessage) error {
 	txn := cm.newRelicInstance.Application().StartTransaction(string(msg.Key))
 	txn.AddAttribute("event.topic", msg.Topic)
 	txn.AddAttribute("event.partition", msg.Partition)
@@ -52,7 +55,7 @@ func (cm *consumerManager) Process(ctx context.Context, msg *ConsumerMessage) er
 	return nil
 }
 
-func (cm *consumerManager) prepareLogFields(msg *ConsumerMessage) logrus.Fields {
+func (cm *consumerManager) prepareLogFields(msg *confluent_kafka.ConsumerMessage) logrus.Fields {
 	return logrus.Fields{
 		"topic":     msg.Topic,
 		"key":       string(msg.Key),

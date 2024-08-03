@@ -1,9 +1,11 @@
-package main
+package listener
 
 import (
 	"confluent_kafka"
 	"confluent_kafka/example/eventmanager"
+	"confluent_kafka/example/kafka"
 	"context"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -12,7 +14,7 @@ type customHandler struct {
 	eventManager eventmanager.IEventManager
 }
 
-func NewCustomHandler(l *logrus.Logger, em eventmanager.IEventManager) confluent_kafka.CustomHandler {
+func NewCustomHandler(l *logrus.Logger, em eventmanager.IEventManager) kafka.CustomHandler {
 	return &customHandler{
 		logger:       l,
 		eventManager: em,

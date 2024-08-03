@@ -1,6 +1,8 @@
-package confluent_kafka
+package kafka
 
 import (
+	"confluent_kafka"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,16 +21,16 @@ func NewSyncHandler(l *logrus.Logger, cm IConsumerManager) ConsumerGroupHandler 
 	}
 }
 
-//func (h *syncHandler) Setup(_ sarama.ConsumerGroupSession) error {
-//	close(h.ready)
-//	return nil
-//}
-//
-//func (h *syncHandler) Cleanup(_ sarama.ConsumerGroupSession) error {
-//	return nil
-//}
+func (h *syncHandler) Setup(_ confluent_kafka.ConsumerGroup) error {
+	close(h.ready)
+	return nil
+}
 
-func (h *syncHandler) ConsumeClaim(sess ConsumerGroup, claim ConsumerGroupClaim) error {
+func (h *syncHandler) Cleanup(_ confluent_kafka.ConsumerGroup) error {
+	return nil
+}
+
+func (h *syncHandler) ConsumeClaim(sess confluent_kafka.ConsumerGroup, claim confluent_kafka.ConsumerGroupClaim) error {
 	ch := make(chan error)
 
 	for {
