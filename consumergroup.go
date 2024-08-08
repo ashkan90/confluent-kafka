@@ -20,9 +20,20 @@ var (
 	InvalidPartition = int32(-1)
 )
 
+var (
+	WatermarkSinglePartition = int32(0)
+	WatermarkTimeout         = int(time.Second.Milliseconds())
+)
+
 type none struct{}
 
 type ConsumerGroup interface {
+	// Watermark spots message count around given topic & partition
+	// if something goes wrong while trying to get watermark values from client
+	// Watermark method intended to return -1
+	// default partition is '0' if no set
+	Watermark(topic string, partition int32) int64
+
 	// Consume joins a cluster of consumers for a given list of topics and
 	// starts a blocking ConsumerGroupSession through the ConsumerGroupHandler.
 	//
@@ -114,6 +125,25 @@ func (c *consumerGroup) Consume(topics []string, handler ConsumerGroupHandler) e
 	}
 
 	return c.release()
+}
+
+func (c *consumerGroup) Watermark(topic string, partition int32) int64 {
+	if topic == "" {
+		c.errors <- errors.New("cannot run watermark with an empty topic")
+		return -1
+	}
+
+	if partition < 0 {
+		partition = WatermarkSinglePartition
+	}
+
+	l, h, err := c.consumerBridge.Client().QueryWatermarkOffsets(topic, partition, WatermarkTimeout)
+	if err != nil {
+		c.errors <- err
+		return -1
+	}
+
+	return h - l
 }
 
 func (c *consumerGroup) Errors() <-chan error {

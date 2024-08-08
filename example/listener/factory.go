@@ -19,6 +19,7 @@ func (f *ExampleEventHandlerFactory) Make(e event.Event) (eventmanager.EventHand
 	switch e.Type() {
 	case constants.DocumentItemSavedType:
 		return nil, nil
+
 	default:
 		return nil, errors.New("şlmlş")
 	}

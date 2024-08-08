@@ -9,6 +9,7 @@
     - [ ] An interface to control state of produced message(s)
 3. [x] Unbound internal and external Interface definitions such as ConsumerInstance
 4. [ ] Integration Test
+5. [x] Watermark query to get message count of given topic
 
 # How to run locally to test package behaviour ?
 

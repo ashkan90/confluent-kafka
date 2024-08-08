@@ -55,6 +55,8 @@ func main() {
 		consumerInstance.Consume(ctx, topics)
 	}()
 
+	messages := _consumer.Watermark(topics[0], confluent_kafka.WatermarkSinglePartition)
+	log.Printf("message count in given topic: %d and partition: %d", messages, confluent_kafka.WatermarkSinglePartition)
 	<-consumerInstance.Handler().Status()
 
 	sigterm := make(chan os.Signal, 1)
